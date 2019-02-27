@@ -1,0 +1,16 @@
+# editorconfig.org
+
+# 表示这个是顶层的editorconfig文件，发现这个文件后就不会再向下查找
+root = true
+
+[*]
+charset = utf-8
+indent_size = 4
+indent_style = space
+# 设置保存文件以空白行来结尾
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+
+[*.md]
+trim_trailing_whitspace = false
