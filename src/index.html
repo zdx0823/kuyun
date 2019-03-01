@@ -19,27 +19,38 @@
 
 	<!-- 头部 -->
 	<div class="header">
-		<h1>酷云</h1>
-		<ul class="hm_l">
-			<li class="ml_active"><a href="javascript:;" id="t_pan">云盘</a></li>
-			<li><a href="javascript:;" id="t_cloud">云服务</a></li>
-			<li><a href="javascript:;" id="t_more">更多</a></li>
-		</ul>
-
-		<div class="hm_r">
-			<div id="user_info">
-				<div class="profile_wrap"><img src="" id="profile" alt=""></div>
-				<p class="name_wrap">
-					<span id="name">测试帐号</span>
-					<i class="iconfont">&#xeb81;</i>
-				</p>
-			</div>
-			<ul class="else">
-				<li><a href="javascript:;" id="el_notice"><i class="iconfont">&#xebf0;</i></a></li>
-				<li><a href="javascript:;" id="el_feedback"><i class="iconfont">&#xeb90;</i></a></li>
-				<li><a href="javascript:;" id="el_skin"><i class="iconfont">&#xeb1f;</i></a></li>
+		<div class="header_large clearfix">
+			<h1 class="logo">酷云</h1>
+			<ul class="hm_l">
+				<li class="ml_active"><a href="javascript:;" id="t_pan">云盘</a></li>
+				<li><a href="javascript:;" id="t_cloud">云服务</a></li>
+				<li><a href="javascript:;" id="t_more">更多</a></li>
 			</ul>
+
+			<div class="hm_r">
+				<div class="user_info">
+					<div class="profile_wrap"><img src="" id="profile" alt=""></div>
+					<p class="name_wrap">
+						<span id="name">测试帐号</span>
+						<i class="iconfont">&#xeb81;</i>
+					</p>
+				</div>
+				<ul class="else">
+					<li><a href="javascript:;" id="el_notice"><i class="iconfont">&#xebf0;</i></a></li>
+					<li><a href="javascript:;" id="el_feedback"><i class="iconfont">&#xeb90;</i></a></li>
+					<li><a href="javascript:;" id="el_skin"><i class="iconfont">&#xeb1f;</i></a></li>
+				</ul>
+			</div>
 		</div>
+		<div class="header_small clearfix">
+			<h1 class="logo">酷云</h1>
+			<div class="header_small_btn">
+				<a href="javascript:;"><i class="iconfont">&#xeb31;</i></a>
+				<a href="javascript:;"><i class="iconfont">&#xeb64;</i></a>
+				<a href="javascript:;" class="hm_r_small_btn"><i class="iconfont">&#xeb4f;</i></a>
+			</div>
+		</div>
+		
 	</div>
 
 
@@ -47,53 +58,65 @@
 	<div class="wrap">
 		<!-- 侧边栏 -->
 		<div class="side_wrap">
-			<ul id="main_menu">
-				<li class="icon"><a href="javascript:;" id="all_menu" class="active"><i class="iconfont">&#xead2;</i>全部目录</a></li>
-				<li><a href="javascript:;" id="pri_menu">私有目录</a></li>
-				<li><a href="javascript:;" id="cla_menu">班级目录</a></li>
-			</ul>
-			<ul id="other_menu">
-				<li class="icon"><a href="javascript:;" id="col_box"><i class="iconfont">&#xead1;</i>收藏夹</a></li>
-				<li class="icon"><a href="javascript:;" id="del_box"><i class="iconfont">&#xeb41;</i>回收站</a></li>
-			</ul>
-			<div class="capacity_tips">
-				<div class="cap_all">
-					<div class="cap_ed"></div>
+			<div class="side_large">
+				<ul id="main_menu">
+					<li class="icon"><a href="javascript:;" id="all_menu" class="active"><i class="iconfont">&#xead2;</i>全部目录</a></li>
+					<li><a href="javascript:;" id="pri_menu">私有目录</a></li>
+					<li><a href="javascript:;" id="cla_menu">班级目录</a></li>
+				</ul>
+				<ul id="other_menu">
+					<li class="icon"><a href="javascript:;" id="col_box"><i class="iconfont">&#xead1;</i>收藏夹</a></li>
+					<li class="icon"><a href="javascript:;" id="del_box"><i class="iconfont">&#xeb41;</i>回收站</a></li>
+				</ul>
+				<div class="capacity_tips">
+					<div class="cap_all">
+						<div class="cap_ed"></div>
+					</div>
+					<p class="tips clearfix">
+						<span>1188/2050</span>
+						<a href="javascript:;" id="cap_ex">扩容</a>
+					</p>
 				</div>
-				<p class="tips clearfix">
-					<span>1188/2050</span>
-					<a href="javascript:;" id="cap_ex">扩容</a>
-				</p>
+				<a href="javascript:;" class="shrink"><i class="iconfont">&#xeb5f;</i><span>收起侧边栏</span></a>
 			</div>
-			<a href="javascript:;" class="shrink"><i class="iconfont">&#xeb5f;</i><span>收起侧边栏</span></a>
-			<div class="hide_field"></div>
+			<div class="side_small">
+				<a href="javascript:;" title="全部目录"><i class="iconfont">&#xead2;</i></a>
+				<a href="javascript:;" title="收藏夹"><i class="iconfont">&#xead1;</i></a>
+				<a href="javascript:;" title="回收站"><i class="iconfont">&#xeb41;</i></a>
+			</div>
+
 		</div>
+
 
 		<div class="main_wrap">
 
 			<div class="panel">
 				<div class="panel_btns">
-						<a href="javascript:;"><i class="iconfont"></i>上传</a>
-						<a href="javascript:;"><i class="iconfont"></i>新建文件夹</a>
-						<a href="javascript:;"><i class="iconfont"></i>下载</a>
-						<a href="javascript:;"><i class="iconfont"></i>删除</a>
-						<a href="javascript:;"><i class="iconfont"></i>重命名</a>
-						<a href="javascript:;"><i class="iconfont"></i>移动到</a>
+						<a href="javascript:;"><i class="iconfont">&#xebb7;</i>上传</a>
+						<div class="panel_btns_main clearfix">
+							<a href="javascript:;"><i class="iconfont">&#xeb31;</i>新建文件夹</a>
+							<a href="javascript:;"><i class="iconfont">&#xeb7c;</i>下载</a>
+							<a href="javascript:;"><i class="iconfont">&#xeb41;</i>删除</a>
+							<a href="javascript:;"><i class="iconfont">&#xeabc;</i>重命名</a>
+							<a href="javascript:;"><i class="iconfont">&#xebc9;</i>移动到</a>
+						</div>
+						<a href="javascript:;" class="panel_btns_more"><i class="iconfont"></i>更多</a>
 				</div>
-				<div class="panel_right">
-					<div class="search_btn">
-						<input type="text" id="search_txt" placeholder="搜索你的文件">
-						<a href="javascript:;" id="search"><i class="iconfont">&#xeb4b;</i></a>
-					</div>
-					<a href="javascript:;" id="eo"><i class="iconfont">&#xeb2b;</i></a>
+
+
+				<div class="search_btn">
+					<input type="text" id="search_txt" placeholder="搜索你的文件">
+					<a href="javascript:;" id="search"><i class="iconfont">&#xeb4b;</i></a>
 				</div>
+
+
 				<p class="file_info">
 					<span class="path">全部文件</span>
-					<span class="sta">已全部加载，共<i>52</i>个</span>
 				</p>
 				<div class="check_btn">
 					<input type="checkbox" id="check_all">
 					<label for="check_all">全选</label>
+					<span class="sta">已全部加载，共<i>52</i>个</span>
 				</div>
 			</div>
 
@@ -110,6 +133,13 @@
 
 
 		</div>
+	</div>
+
+	<!-- 底部菜单，平板或手机模式可用 -->
+	<div class="footer_menu">
+		<a href="javascript:;" class="active"><i class="iconfont">&#xead2;</i><span>全部目录</span></a>
+		<a href="javascript:;"><i class="iconfont">&#xead1;</i><span>收藏夹</span></a>
+		<a href="javascript:;"><i class="iconfont">&#xeb41;</i><span>回收站</span></a>
 	</div>
 
 </div>
