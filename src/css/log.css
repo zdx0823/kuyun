@@ -18,28 +18,54 @@
     left: 20px;
     color: #fff;
 }
+
+
 .log_form_wrap{
+    width: 100%;
+    height: 100%;
     position: absolute;
+}
+.log_form{
     opacity: 0;
+    position: relative;
+    top: 25%;
+    margin: 0 auto;
     width: 300px;
     background: #fff;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #d9d9d9;
 }
-.log_form_wrap nav{
+.log_form nav{
     width: 100%;
     padding: 16px 0px;
 }
-.log_form_wrap nav h3{
+.log_form nav h3{
     float: left;
     font-size: 16px;
     color: #282828;
 }
-.log_form_wrap nav span{
+.log_form nav span{
     float: right;
-    color: #03A9F4;
+    color: #649130;
 }
+.log_form_shade{
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,.2);
+    
+    text-align: center;
+    line-height: 238px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #000000;
+}
+
+
 .log{}
 .log_inputs{}
 .log_inputs input{
@@ -49,6 +75,9 @@
     border: 1px solid #ddd;
     outline: none;
 }
+.log_inputs_tip{ color: #F44336; display: none; }
+.log_inputs_tip i{ position: relative; top: 2px; }
+
 #account{}
 #password{
     margin-top: -1px;
@@ -61,17 +90,29 @@
     top: -2px;
     color: #333;
 }
+.log_member_tip{
+    position: absolute;
+    color: #F44336;
+}
 
 .log_submit_wrap{
     margin-bottom: 40px;
 }
 #submit{
+    float: left;
     width: 100%;
     height: 36px;
     border: none;
-    background: #03A9F4;
+    background: #8bc34a;
     color: #fff;
+    text-align: center;
+    line-height: 36px;
     font-size: 14px;
+    border-radius: 5px;
+    transition: background .2s;
+}
+#submit:hover{
+    background: #649130;
 }
 .pass_o{
     color: #666;
@@ -87,7 +128,7 @@
     background: #fff;
 }
 .other_enter a{
-    color: #2196F3;
+    color: #649130;
 }
 #log_WeChat{
     float: left;
@@ -104,4 +145,16 @@
     line-height: 30px;
     text-align: center;
     background: rgba(0,0,0,.2);
+}
+
+
+/*svg icon*/
+.svg_loading{
+    position: absolute;
+    left: 42%;
+    top: 40%;
+}
+.svg_loading path,
+.svg_loading rect {
+  /* fill: #fff; */
 }

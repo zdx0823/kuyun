@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+<script src="lib/jquery-3.3.1.js"></script>
+</head>
+<body>
+<script>
+
+$(function(){
+
+    var sid = 20177715114;
+    // for(var i=0; i<10; i++){
+    //     sid++;
+    //     $.ajax({
+    //         type:"POST",
+    //         url:"php/handle/user.php",
+    //         data:{
+    //             act:"register",
+    //             sid:sid,
+    //             username:"蜜蜂老牛黄瓜--"+i,
+    //             password:sid
+    //         },
+    //         success:function(data){
+    //             document.body.innerHTML = data;
+    //         }
+    //     });
+    // }
+
+
+
+      $.ajax({
+        type:"POST",
+        url:"php/handle/user.php",
+        data:{
+            act:"login",
+            sid:"20177715116",
+            password:'20177715116'
+        },
+        success:function(data){
+            document.body.innerHTML = data;
+        }
+    }); 
+
+    /*
+asdfasdfasdf */
+
+    // for(var i=0; i<1; i++){
+
+    //     $.ajax({
+    //         type:'POST',
+    //         url:'php/handle/file.php',
+    //         data:{
+    //             act:"create",
+    //             fid:0,
+    //             method:"user",
+    //             type:"folder"
+    //         },
+    //         success:function(data){
+    //             document.body.innerHTML = data;
+    //         }
+    //     });
+
+    // }
+
+});
+
+
+
+
+
+
+</script>
+</body>
+</html>

@@ -61,8 +61,8 @@
 			<div class="side_large">
 				<ul id="main_menu">
 					<li class="icon"><a href="javascript:;" id="all_menu" class="active"><i class="iconfont">&#xead2;</i>全部目录</a></li>
-					<li><a href="javascript:;" id="pri_menu">私有目录</a></li>
-					<li><a href="javascript:;" id="cla_menu">班级目录</a></li>
+					<li><a href="javascript:;" class="pri_menu">私有目录</a></li>
+					<li><a href="javascript:;" class="cla_menu">班级目录</a></li>
 				</ul>
 				<ul id="other_menu">
 					<li class="icon"><a href="javascript:;" id="col_box"><i class="iconfont">&#xead1;</i>收藏夹</a></li>
@@ -123,9 +123,14 @@
 
 			<!-- 显示文件的区域 -->
 			<div class="files_wrap">
-				<div class="file">
+				<div class="file pri_menu" title="私有目录">
 					<div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>
-					<div class="filename"><a href="javascript:;">文件名文件名文件名</a></div>
+					<div class="filename"><a href="javascript:;">私有目录</a></div>
+					<div class="file_checkbox"><span class="un_check"></span><span class="checked"></span></div>
+				</div>
+				<div class="file cla_menu" title="班级目录">
+					<div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>
+					<div class="filename"><a href="javascript:;">班级目录</a></div>
 					<div class="file_checkbox"><span class="un_check"></span><span class="checked"></span></div>
 				</div>
 

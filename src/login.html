@@ -6,42 +6,49 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <link rel="stylesheet" href="css/normalize.css" />
     <link rel="stylesheet" href="css/init.css" />
-    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="lib/iconfont/iconfont.css" />
+    <link rel="stylesheet" href="css/log.css" />
     <title>酷云bata</title>
     <script src="lib/jquery-3.3.1.js"></script>
-    <script src="lib/jquery.mousewheel.js"></script>
+    <script src="lib/jquery.cookie.js"></script>
     <script src="lib/TweenMax.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/log.js"></script>
 </head>
 <body>
 
     <img src="img/2.jpg" class="log_bg" alt="">
     <h1 class="logo">酷云</h1>
     <div class="log_form_wrap">
-        <nav class="clearfix">
-            <h3>帐号密码登录</h3>
-            <span>短信快捷登录（未开发）</span>
-        </nav>
-        <form class="log">
-            <div class="log_inputs">
-                <input type="text" placeholder="请输入帐号" id="account">
-                <input type="password" placeholder="请输入密码" id="password">
-            </div>
-            <p class="log_member_pass">
-                <input type="checkbox" id="member_pass">
-                <label for="member_pass" id="member_pass_checkbox">下次自动登录</label>
-            </p>
-            <div class="log_submit_wrap">
-                <input type="submit" id="submit" value="登录">
-                <p class="pass_o">
-                    <a href="javascript:;" id="pass_fgt"></a>
+        <div class="log_form">
+            <nav class="clearfix">
+                <h3>帐号密码登录</h3>
+                <span>短信快捷登录（未开发）</span>
+            </nav>
+            <div class="log">
+                <div class="log_inputs">
+                    <input type="text" placeholder="请输入帐号" id="account">
+                    <input type="password" placeholder="请输入密码" id="password">
+                    <p class="log_inputs_tip"><i class="iconfont">&#xeb39;</i><span>帐号不能为空</span></p>
+                </div>
+                <p class="log_member_pass">
+                    <input type="checkbox" id="member_pass">
+                    <label for="member_pass" id="member_pass_checkbox">下次自动登录</label>
+                    <span class="log_member_tip">,请勿在公共电脑上点击此选项</span>
+                </p>
+                <div class="log_submit_wrap">
+                    <a href="javascript:;" id="submit">登录</a>
+                    <p class="pass_o">
+                        <a href="javascript:;" id="pass_fgt"></a>
+                    </p>
+                </div>
+                <p class="other_enter">
+                    <a href="javascript:;" id="log_WeChat">扫一扫登录（未开发）</a>
+                    <a href="javascript:;" class="go_for_register">立即注册</a>
                 </p>
             </div>
-            <p class="other_enter">
-                <a href="javascript:;" id="log_WeChat">扫一扫登录（未开发）</a>
-                <a href="javascript:;" class="go_for_register">立即注册</a>
-            </p>
-        </form>
+            <div class="log_form_shade"></div>
+        </div>
+
     </div>
     <footer class="log_footer">测试测试</footer>
     
