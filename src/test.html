@@ -13,16 +13,16 @@
 
 $(function(){
 
-    var sid = 20177715114;
-    // for(var i=0; i<10; i++){
-    //     sid++;
+    // var sid = 20177715114;
+    // for(var i=0; i<1; i++){
+    //     // sid++;
     //     $.ajax({
     //         type:"POST",
     //         url:"php/handle/user.php",
     //         data:{
     //             act:"register",
     //             sid:sid,
-    //             username:"蜜蜂老牛黄瓜--"+i,
+    //             username:"蜜蜂老牛黄瓜",
     //             password:sid
     //         },
     //         success:function(data){
@@ -38,8 +38,8 @@ $(function(){
         url:"php/handle/user.php",
         data:{
             act:"login",
-            sid:"20177715116",
-            password:'20177715116'
+            sid:"20177715114",
+            password:'20177715114'
         },
         success:function(data){
             document.body.innerHTML = data;
@@ -51,19 +51,21 @@ asdfasdfasdf */
 
     // for(var i=0; i<1; i++){
 
-    //     $.ajax({
-    //         type:'POST',
-    //         url:'php/handle/file.php',
-    //         data:{
-    //             act:"create",
-    //             fid:0,
-    //             method:"user",
-    //             type:"folder"
-    //         },
-    //         success:function(data){
-    //             document.body.innerHTML = data;
-    //         }
-    //     });
+        // $.ajax({
+        //     type:'POST',
+        //     url:'php/handle/file.php',
+        //     data:{
+        //         act:"create",
+        //         fid:0,
+        //         method:"public",
+        //         type:"file",
+        //         name:"蜜蜂老牛黄瓜-测试文件-3",
+        //         ext:"txt"
+        //     },
+        //     success:function(data){
+        //         document.body.innerHTML = data;
+        //     }
+        // });
 
     // }
 

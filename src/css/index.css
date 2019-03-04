@@ -370,7 +370,7 @@ body{
 #eo{ margin-left: 10px; color: #444; }
 #eo i{ font-size: 28px; }
 
-.file_info{
+#breadcrumbs{
     position: absolute;
     bottom: 14px;
     width: 98%;
@@ -378,6 +378,13 @@ body{
     transition: opacity .2s;
 }
 .path{ float: left; }
+.path_active{
+    color: #8bc34a;
+}
+.path_active:hover{
+    text-decoration: underline;
+}
+
 .sta{ display: inline-block; margin-left: 10px; }
 .sta i{ font-style: normal; margin: 0 4px; }
 .check_btn{
@@ -397,6 +404,12 @@ body{
     height: 100%;
     /* overflow-y: scroll; */
 }
+.files_loading{
+    display: none;
+    position: relative;
+    top: 25%;
+    text-align: center;
+}
 .file{
     float: left;
     margin: 10px;
@@ -408,6 +421,9 @@ body{
     border: 1px solid transparent;
     transition: background .2s,border .2s;
     cursor: pointer;
+}
+.file > *{
+    pointer-events: none;
 }
 .file:hover{
     background: rgba(157, 255, 43, 0.2);
@@ -525,7 +541,7 @@ body{
     .panel_btns{
         opacity: 0;
     }
-    .file_info{
+    .breadcrumbs{
         opacity: 0;
     }
     .panel_right{

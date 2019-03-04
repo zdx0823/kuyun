@@ -156,6 +156,8 @@ function countData(){
  * 接收SESSION参数
  * 		uid:学生id
  * 		sid:学号
+ * 接收POST参数
+ * 		fid:用户当前所处目录id，即所点击文件的上级目录id
  * @return 【字符串：详细信息】
  */
 function userData(){
