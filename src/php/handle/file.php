@@ -156,6 +156,7 @@ function create(){
 		}
 	}
 
+	$result['id'] = $result['status'] == 1 ? mysql_insert_id() : -1;
 	echo json_encode($result);
 
 	// 备份

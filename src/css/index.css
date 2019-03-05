@@ -449,8 +449,8 @@ body{
     background: rgba(157, 255, 43, 0.2);
     border: 1px solid #ccc;
 }
-.file:hover .file_checkbox span,.file_active .file_checkbox span{
-    opacity: 1;
+.file:hover .file_checkbox,.file_active .file_checkbox{
+    opacity: .2;
 }
 
 
@@ -472,16 +472,46 @@ body{
     position: absolute;
     top: 10px;
     left: 10px;
-}
-.file_checkbox span{
-    opacity: 0;
-    width: 14px;
-    height: 14px;
-    position: absolute;
-    background: #8bc34a;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    transition: opacity .2s;
+    opacity: 0;
 }
+.file_checkbox i{
+    position: absolute;
+    top: -6px;
+    left: -6px;
+    font-size: 28px;
+    color: #4caf50;
+}
+.file_checkbox_ed{ opacity: 1 !important; }
+.filename_input{
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 14px;
+    height: 22px;
+}
+.filename_input > *{ float: left; }
+.filename_input input{
+    width: 100px;
+    height: 16px;
+    margin-left: 3px;
+    border: 1px solid #ccc;
+    text-align: center;
+    border-radius: 3px;
+}
+.filename_input i{
+    position: absolute;
+    width: 16px;
+    height: 17px;
+    font-size: 15px;
+    border: 1px solid #666;
+    border-radius: 3px;
+}
+.filename_input i:hover{ background: #8bc34a; color: #fff; }
+.filename_input i:nth-of-type(1){ right: 11px; }
+.filename_input i:nth-of-type(2){ right: -11px; }
 
 .footer_menu{
     opacity: 0;

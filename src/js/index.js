@@ -12,6 +12,15 @@ $(function(){
     });
  */
 
+
+    // 全局环境
+    var g = {
+        method:null,
+        id:-1,
+    }
+
+
+
     /**
      * 用户信息对象
      */
@@ -99,6 +108,8 @@ $(function(){
             var act = target.attr('act');
             var fid = target.attr('files_id');
             var sign = act+'_'+fid;
+            g.method = act;
+            g.id = fid;
         }
 
         cat.files_loading.show();
@@ -111,12 +122,12 @@ $(function(){
                 '<div class="file" act="user" files_id="0" title="私有目录">\
                     <div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>\
                     <div class="filename"><a href="javascript:;">私有目录</a></div>\
-                    <div class="file_checkbox"><span class="un_check"></span><span class="checked"></span></div>\
+                    <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
                 </div>\
                 <div class="file" act="lesson" files_id="0" title="班级目录">\
                     <div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>\
                     <div class="filename"><a href="javascript:;">班级目录</a></div>\
-                    <div class="file_checkbox"><span class="un_check"></span><span class="checked"></span></div>\
+                    <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
                 </div>';
                 cat.files_con.append(cat.ts['all_-1']);
                 cat.files_con.html(cat.ts['all_-1']);
@@ -148,7 +159,7 @@ $(function(){
                                 '<div class="file" act="user" files_id="'+id+'" title="'+name+'">\
                                     <div class="icon_img"><img src="'+icon+'" alt=""></div>\
                                     <div class="filename"><a href="javascript:;">'+name+'</a></div>\
-                                    <div class="file_checkbox"><span class="un_check"></span><span class="checked"></span></div>\
+                                    <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
                                 </div>';
                             });
                         });
@@ -209,6 +220,10 @@ $(function(){
     };
     
 
+    // 存放被选中的文件的id及相关信息，以对象为单位
+    cat.checked_files = {};
+
+
     // 各种事件
     cat.event = function(){
         // 文件双击事件
@@ -217,13 +232,25 @@ $(function(){
             if(target){
                 cat.build_nodes(target);
                 cat.build_breadcrumbs(target);
+                cat.checked_files = {};
             }
         });
 
+
         // 文件点击事件
         cat.files_con.on('click',function(e){
-            var target = $(e.target).parents('.file');
-            target.toggleClass('file_active');
+            var file = $(e.target).parents('.file');
+            var checkbox = $(e.target).parent('.file_checkbox');
+            file.toggleClass('file_active');
+            if(checkbox[0]){
+                checkbox.toggleClass('file_checkbox_ed');
+            }else{
+                file.find('.file_checkbox').toggleClass('file_checkbox_ed');
+            }
+
+            var key = file.attr('act')+'_'+file.attr('files_id');
+            cat.checked_files[key] = cat.checked_files[key] ? '' : file.attr('title');
+            console.log(cat.checked_files);
         });
 
         // 面包屑
@@ -255,10 +282,35 @@ $(function(){
     panel.panel_btns = $('.panel_btns');
     panel.panel_btns_small = $('.panel_btns_small');
     panel.panel_btns_other = $('.panel_btns_other');
+    panel.rechristen = function(){
+
+        console.log(765);
+
+        // $.ajax({
+        //     type:'POST',
+        //     url:'php/handle/file.php',
+        //     data:{
+        //         act:"rechristen",
+        //         fid:g.id,
+        //         method:g.method,
+        //         type:'folder',
+        //         name:''
+        //     },
+        //     success:function(data){
+                
+        //     }
+        // });
+    };
     panel.event = function(){
         panel.panel_btns.on('click',function(e){
             var _target = $(e.target).parents('a')[0] || $(e.target)[0];
             var target = $(_target);
+            var act = target.attr('act');
+            switch (act){
+                case 'rechristen':
+                    panel.rechristen();
+                    break;
+            }
         });
 
         panel.panel_btns_small.hover(function(){
