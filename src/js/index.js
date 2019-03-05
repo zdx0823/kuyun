@@ -49,8 +49,8 @@ $(function(){
     usi.init = function(){
         usi.get_user_info();
     };
-
     usi.init();
+
 
 
     /**
@@ -221,7 +221,9 @@ $(function(){
     
 
     // 存放被选中的文件的id及相关信息，以对象为单位
-    cat.checked_files = {};
+    cat.checked_files = {
+        length:0
+    };
 
 
     // 各种事件
@@ -249,9 +251,21 @@ $(function(){
             }
 
             var key = file.attr('act')+'_'+file.attr('files_id');
-            cat.checked_files[key] = cat.checked_files[key] ? '' : file.attr('title');
-            console.log(cat.checked_files);
+
+            if (cat.checked_files[key]){
+                cat.checked_files[key] = '';
+                if (cat.checked_files.length > 0) cat.checked_files.length--;
+            }else{
+                cat.checked_files[key] = {
+                    target:file,
+                    title:file.attr('title'),
+                    id: file.attr('files_id')
+                };
+                cat.checked_files.length++;
+            }
+
         });
+
 
         // 面包屑
         cat.breadcrumbs.on('click',function(e){
@@ -284,7 +298,50 @@ $(function(){
     panel.panel_btns_other = $('.panel_btns_other');
     panel.rechristen = function(){
 
-        console.log(765);
+        if (cat.checked_files.length != 1) return false; // 暂时只允许同时更改一个文件的名字
+
+        var arr = [];
+        for (var key in cat.checked_files){
+            if (key == 'length') continue;
+            arr.push(cat.checked_files[key]);
+        }
+        
+        var target = arr[0];
+        var e_filename = target.target.find('.filename');
+        var e_filename_a = target.target.find('a');
+        e_filename_a.hide();
+        if (e_filename.find('.filename_input')){
+            
+        }
+        e_filename.append('\
+            <div class="filename_input">\
+                <input type="text">\
+                <i class="iconfont confirm" title="确认">&#xeb29;</i>\
+                <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
+            </div>\
+        ');
+
+        var pre_name = e_filename_a.html();
+        var o_filename_input = e_filename.find('.filename_input')
+        var o_input = o_filename_input.find('input');
+        var o_confirm_btn = o_filename_input.find('.confirm');
+        var o_cancel_btn = o_filename_input.find('.cancel');
+        var now_name = '';
+        o_input.val(pre_name);
+        o_input.focus();
+        
+        o_confirm_btn.on('click',function(){
+            now_name = o_input.val();
+            // console.log(o_input.val());
+            // console.log(e_filename_a.html());
+            e_filename_a.html(now_name);
+            e_filename_a.show();
+            o_filename_input.hide();
+        });
+
+
+        
+        // target
 
         // $.ajax({
         //     type:'POST',
@@ -350,6 +407,7 @@ $(function(){
         this.event();
     };
     side.init();
+
 
 
     var footer = {};
