@@ -240,6 +240,7 @@ $(function(){
 
     // 初始化
     cat.init = function(){
+
         if(!cat.files_loading.html()){
             cat.files_loading.append(cat.svg_loading({size:40,color:'#8bc34a'}));
         }
