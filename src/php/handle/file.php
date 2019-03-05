@@ -115,21 +115,19 @@ function create(){
 			$folderPath = mysql_fetch_array($sql)[0];
 		}
 
+
 		if (!isset($level) && $folderPath) {
 			
-			if($method == "public"){
-				$path = $folderPath.'/'.$name;
-			}else{
-				$path = $fid == 0 ? $folderPath : $folderPath.'/'.$name;
-			}
+			$path = $folderPath.'/'.$name;
 
-			if ($fid>0 && $type == 'file') {
+			// var_dump($path);exit;
+			if ($type == 'file') {
 				$res = touch(getCode($path));
 			} else if ($type == 'folder') {
 				$res = mkdir(getCode($path), 0777);
 			}
 
-			if (isset($res)) {
+			if (isset($res) && $folderPath) {
 				if ($method == 'user') {
 					$ins = "INSERT INTO `{$table}` (`uid`, `fid`, `name`, `path`, `create_time`, `update_time`) VALUES ({$uid}, {$fid}, '{$name}', '{$path}', {$time}, {$time})";
 				} else if ($method == 'public') {

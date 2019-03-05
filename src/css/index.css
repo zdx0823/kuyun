@@ -306,20 +306,20 @@ body{
 .panel_btns{
     float: left;
     opacity: 1;
-    padding: 10px;
+    margin: 10px;
     transition: opacity .2s;
 }
-.panel_btns a{
-    padding: 6px 20px;
-    background: #8bc34a;
+.panel_btns a,.panel_btns_small{
     float: left;
     margin: 0 10px;
-    border-radius: 5px;
+    padding: 6px 20px;
     color: #fff;
     line-height: 20px;
+    background: #8bc34a;
+    border-radius: 5px;
     transition: background .2s;
 }
-.panel_btns a:hover{
+.panel_btns a:hover,.panel_btns_small:hover{
     background: #7eb83d;
 }
 .panel_btns a i{
@@ -327,10 +327,20 @@ body{
     left: -4px;
     top: 2px;
 }
-.panel_btns_more{
+.panel_btns_small{
     display: none;
+    padding: 0 !important;
+    width: 64px;
+    height: 33px;
+    overflow: hidden;
+    text-align: center;
+    line-height: 33px !important;
+    cursor: pointer;
 }
-.panel_btns_main{
+.panel_btns_large{
+    float: left;
+}
+.panel_btns_small{
     float: left;
 }
 
@@ -370,7 +380,7 @@ body{
 #eo{ margin-left: 10px; color: #444; }
 #eo i{ font-size: 28px; }
 
-.file_info{
+#breadcrumbs{
     position: absolute;
     bottom: 14px;
     width: 98%;
@@ -378,6 +388,13 @@ body{
     transition: opacity .2s;
 }
 .path{ float: left; }
+.path_active{
+    color: #8bc34a;
+}
+.path_active:hover{
+    text-decoration: underline;
+}
+
 .sta{ display: inline-block; margin-left: 10px; }
 .sta i{ font-style: normal; margin: 0 4px; }
 .check_btn{
@@ -397,6 +414,25 @@ body{
     height: 100%;
     /* overflow-y: scroll; */
 }
+.files_loading{
+    display: none;
+    position: relative;
+    top: 25%;
+    text-align: center;
+}
+.files_empty{
+    font-size: 18px;
+    text-align: center;
+    margin-top: 15%;
+}
+.files_empty img{
+    display: block;
+    margin: 0 auto;
+    width: 140px;
+}
+.files_empty a{ color: #84bf40; }
+
+
 .file{
     float: left;
     margin: 10px;
@@ -409,13 +445,14 @@ body{
     transition: background .2s,border .2s;
     cursor: pointer;
 }
-.file:hover{
+.file:hover,.file_active{
     background: rgba(157, 255, 43, 0.2);
     border: 1px solid #ccc;
 }
-.file:hover .file_checkbox span{
+.file:hover .file_checkbox span,.file_active .file_checkbox span{
     opacity: 1;
 }
+
 
 .icon_img{
     text-align: center;
@@ -425,9 +462,7 @@ body{
     height: 70px;
 }
 .filename{
-    margin-top: 6px;
-    height: 30px;
-    line-height: 30px;
+    margin-top: 10px;
     text-align: center;
     overflow: hidden;
     white-space: nowrap;
@@ -456,6 +491,7 @@ body{
     bottom: -42px;
     border-top: 1px solid #d1d1d1;
     padding: 4px 0;
+    background: #fff;
     transition: opacity .2s, bottom .2s;
 }
 .footer_menu a{
@@ -481,12 +517,35 @@ body{
         display: block;
         opacity: 1;
     }
-    .panel_btns_main{
-        display: none;
+    .panel_btns_large{
+        width: 200px;
+        height: 33px;
+        overflow: hidden;
     }
-    .panel_btns_more{
+
+    .panel_btns_small{
         display: block !important;
+        position: absolute;
+        left: 220px;
+        top: 10px;
+        z-index: 10;
+        height: 31px;
+        line-height: 31px;
+        border: 1px solid #8bc34a;
     }
+
+    .panel_btns_small a{
+        width: 100% !important;
+        padding: 6px 0 !important;
+        margin: 0 !important;
+        background: #fff;
+        border-radius: 0;
+        color: #333;
+    }
+    .panel_btns_small a:hover{
+        color: #fff;
+    }
+
     body{
         background: red;
     }
@@ -525,7 +584,7 @@ body{
     .panel_btns{
         opacity: 0;
     }
-    .file_info{
+    #breadcrumbs{
         opacity: 0;
     }
     .panel_right{
