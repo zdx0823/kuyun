@@ -9,9 +9,21 @@
 <script src="lib/jquery-3.3.1.js"></script>
 </head>
 <body>
+    <input type="text" value="测试测试测试.txt">
 <script>
 
 $(function(){
+
+
+    var input = $('input');
+    var val = input.val();
+    input[0].focus();
+    input[0].selectionStart = 0;
+    // console.log(val.length);
+    input[0].selectionEnd = val.lastIndexOf('.');
+
+
+
 
     // var sid = 20177715114;
     // for(var i=0; i<1; i++){
@@ -34,20 +46,20 @@ $(function(){
 
 
 
-    $.ajax({
-        type: 'POST', url: 'php/handle/file.php',
-        data: {
-            act: "rechristen",
-            fid: 0,
-            id: 26,
-            method: 'user',
-            type: 'folder',
-            name: 'abcdefg'
-        },
-        success: function (data) {
-            document.body.innerHTML = data;
-        }
-    });
+    // $.ajax({
+    //     type: 'POST', url: 'php/handle/file.php',
+    //     data: {
+    //         act: "rechristen",
+    //         fid: 0,
+    //         id: 26,
+    //         method: 'user',
+    //         type: 'folder',
+    //         name: 'abcdefg'
+    //     },
+    //     success: function (data) {
+    //         document.body.innerHTML = data;
+    //     }
+    // });
 
 
 

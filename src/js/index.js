@@ -25,8 +25,6 @@ $(function(){
             global_tip = $('<p id="global_tip"></p>');
             $('.content').append(global_tip);
         }
-        console.log(words);
-        console.log(condition);
         global_tip.html(words);
 
         global_tip.css('left', ($(window).width() - global_tip.width())/2 );
@@ -35,7 +33,7 @@ $(function(){
         global_tip.show();
         TweenMax.from(global_tip, .2, { opacity: 0, top: global_tip.offset().top-20});
         TweenMax.to(global_tip, .2, { opacity: 1, top: global_tip.offset().top+30});
-
+        
         if (condition !== false) {
             TweenMax.to(global_tip, .2, {
                 opacity: 0, top: global_tip.offset().top - 10, onComplete: function () {
@@ -43,9 +41,62 @@ $(function(){
                 }
             }).delay(1);
         }
+    };
+    g.dialog = function (callback) {
+        var words = words || '警告';
+        var global_dialog = $('#global_dialog');
+        if (!global_dialog[0]) {
+            global_dialog = $('\
+                <div id="global_dialog">\
+                    <div class="dialog">\
+                        <div class="head">\
+                            <h3>确认删除</h3>\<a class="close" href="javascript:;"><i class="iconfont">&#xeb2c;</i></a>\
+                        </div>\
+                        <p>确认要把所选文件放入回收站吗？<br>删除的文件可在10天内通过回收站还原</p>\
+                        <div class="btns">\
+                            <a class="confirm" href="javascript:;">确定</a>\
+                            <a class="cancel" href="javascript:;">取消</a>\
+                        </div>\
+                    </div>\
+                </div>\
+            ');
+            $('.content').append(global_dialog);
+        };
+        global_dialog.show();
+        var confirm_btn = global_dialog.find('.confirm'),
+            cancel_btn = global_dialog.find('.cancel'),
+            close_btn = global_dialog.find('.close'),
+            head = global_dialog.find('.head'),
+            dialog = global_dialog.find('.dialog');
+        confirm_btn.on('click',function(){
+            global_dialog.hide();
+            callback && callback();
+        });
+        cancel_btn.on('click',function(){ global_dialog.hide(); });
+        close_btn.on('click',function(){ global_dialog.hide(); });
+        head.on('mousedown',function(e){
+            var dis_x = e.pageX - dialog.offset().left;
+            var dis_y = e.pageY - dialog.offset().top;
+            $(document).on('mousemove',function(e){
+                dialog.css('margin','0');
+                dialog.css('position','absolute');
+                var left = e.pageX - dis_x;
+                var top = e.pageY - dis_y;
+                left = left <= 0 ? 0 : left; 
+                left = left >= $(window).width() - dialog.width() ? $(window).width() - dialog.width() : left; 
+                top = top <= 0 ? 0 : top; 
+                top = top >= $(window).height() - dialog.height() ? $(window).height() - dialog.height() : top; 
 
+                dialog.css('left', left);
+                dialog.css('top', top);
+            });
+            $(document).on('mouseup', function(){
+                $(this).off('mousemove');
+                $(this).off('mouseup');
+            });
+        });
+    };
 
-    }
     g.init = function(){}
     g.init();
 
@@ -151,12 +202,12 @@ $(function(){
             // 限于后台代码没预备，暂时手动载入
             if(target == 'all_-1'){
                 cat.ts['all_-1'] = 
-                '<div class="file" act="user" files_id="0" title="私有目录">\
+                '<div class="file" type="folder" act="user" files_id="0" title="私有目录">\
                     <div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>\
                     <div class="filename"><a href="javascript:;">私有目录</a></div>\
                     <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
                 </div>\
-                <div class="file" act="lesson" files_id="0" title="班级目录">\
+                <div class="file" type="folder" act="lesson" files_id="0" title="班级目录">\
                     <div class="icon_img"><img src="lib/coloursIcon/wenjian.png" alt=""></div>\
                     <div class="filename"><a href="javascript:;">班级目录</a></div>\
                     <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
@@ -167,13 +218,14 @@ $(function(){
             }else{
                 $.ajax({type:'POST', url:'php/handle/data.php', data:{ act:act, fid:fid }, success:function(data){
                     var obj = JSON.parse(data),
-                        files = [obj.folder,obj.file],
+                        files = [obj.folder,obj.file],      // 这条语句谨慎更改
                         ii_path = {
                             folder:'lib/coloursIcon/wenjian.png',
                             txt:'lib/coloursIcon/txt.png',
                             unknown:'lib/coloursIcon/unknown.png',
                         };
                     var nodes = '';
+
                     if(obj.folder || obj.file){
 
                         $.each(files,function(i,list){
@@ -181,14 +233,16 @@ $(function(){
                                 var id = item.id,
                                     name = item.name,
                                     ext = name.substr(name.lastIndexOf('.')+1),
-                                    icon = ii_path.folder;
+                                    icon = ii_path.folder,
+                                    type = i == 0 ? 'folder' : 'file';
+
                                 if(i == 0){
                                     icon = ii_path.folder;
                                 }else{
                                     icon = ii_path[ext] ? ii_path[ext] : ii_path.unknown;
                                 }
                                 nodes += 
-                                '<div class="file" act="user" files_id="'+id+'" title="'+name+'">\
+                                    '<div class="file" act="user" type="'+type+'" files_id="'+id+'" title="'+name+'">\
                                     <div class="icon_img"><img src="'+icon+'" alt=""></div>\
                                     <div class="filename"><a href="javascript:;">'+name+'</a></div>\
                                     <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
@@ -301,7 +355,8 @@ $(function(){
                 cat.checked_files[key] = {
                     target:file,
                     title:file.attr('title'),
-                    id: file.attr('files_id')
+                    id:file.attr('files_id'),
+                    type:file.attr('type')
                 };
                 cat.checked_files.length++;
             }
@@ -349,7 +404,7 @@ $(function(){
 
         // 设置先决条件,暂时这么写
         if (cat.checked_files.length > 1){
-            g.tip('一次只能重命名一个文件夹');
+            g.tip('一次只能重命名一个文件或文件夹');
             return false;
         } else if (cat.checked_files.length == 0) {
             g.tip('请选择修改对象');
@@ -378,7 +433,7 @@ $(function(){
         } else {
             e_filename.append('\
                 <div class="filename_input">\
-                    <input type="text">\
+                    <input type="text" spellcheck="false">\
                     <i class="iconfont confirm" title="确认">&#xeb29;</i>\
                     <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
                 </div>\
@@ -396,8 +451,13 @@ $(function(){
         var now_name = '';
         o_input.val(pre_name);
         o_input.focus();
+        o_input[0].selectionStart = 0;
+        o_input[0].selectionEnd = o_input.val().lastIndexOf('.');
         
+        
+        o_confirm_btn.off('click'); // 防止重复绑定事件
         o_confirm_btn.on('click',function(){
+            
             now_name = o_input.val();
             if(pre_name != now_name){
                 g.tip('正在重命名...', false);
@@ -407,21 +467,20 @@ $(function(){
                         fid: g.id,
                         id: target.id,
                         method: g.method,
-                        type: 'folder',
+                        type: target.type,
                         name: now_name
                     },
                     success: function (data) {
                         var _obj = JSON.parse(data);
-                        var status = _obj.status;
                         if (_obj.status == 1) {
                             e_filename_a.html(now_name);
                             e_filename_a.show();
                             o_filename_input.hide();
-                            console.log(12345);
                             g.tip('更改成功');
                             target.target[0].is_working = false;
                         } else{
                             g.tip('更改失败');
+                            o_input.val(pre_name);
                         }
                     }
                 });
@@ -441,7 +500,39 @@ $(function(){
         });
 
     };
-    
+    panel.del = function(){
+        var obj = cat.checked_files;
+        var arr = [];
+        for (var key in obj){
+            if (key == 'length') continue;
+            var _arr = [
+                obj[key].type,
+                obj[key].id,
+            ];
+            arr.push(_arr);
+        }
+        if (obj.length != 0) {
+            g.tip('正在删除...', false);
+            g.dialog(function(){
+                $.ajax({type: 'POST', url: 'php/handle/file.php', data:{ act:"del",method:0,data:arr},success:function(data){
+
+                    var obj = JSON.parse(data);
+                    if (obj.status == 1) {
+                        g.tip('删除成功');
+                        for (var key in cat.checked_files) {
+                            if (key == 'length') continue;
+                            cat.checked_files[key].target.remove();
+                        }
+                    } else {
+                        g.tip('删除失败');
+                    }
+
+                }});
+            });
+        }
+    };
+
+
     panel.event = function(){
         panel.panel_btns.on('click',function(e){
             var _target = $(e.target).parents('a')[0] || $(e.target)[0];
@@ -450,6 +541,9 @@ $(function(){
             switch (act){
                 case 'rechristen':
                     panel.rechristen();
+                    break;
+                case 'del':
+                    panel.del();
                     break;
             }
         });
