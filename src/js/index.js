@@ -17,7 +17,38 @@ $(function(){
     var g = {
         method:null,
         id:-1,
+    };
+    g.tip = function (words, condition){
+        var words = words || '警告';
+        var global_tip = $('#global_tip');
+        if (global_tip[0]){
+
+        }else{
+            global_tip = $('<p id="global_tip"></p>');
+            $('.content').append(global_tip);
+        }
+        
+        global_tip.html(words);
+
+        global_tip.css('left', ($(window).width() - global_tip.width())/2 );
+        global_tip.css('top', ($(window).height() - global_tip.height())*.15);
+
+        global_tip.show();
+        TweenMax.from(global_tip, .2, { opacity: 0, top: global_tip.offset().top-20});
+        TweenMax.to(global_tip, .2, { opacity: 1, top: global_tip.offset().top+30});
+
+        if (condition !== false) {
+            TweenMax.to(global_tip, .2, {
+                opacity: 0, top: global_tip.offset().top - 10, onComplete: function () {
+                    global_tip.hide();
+                }
+            }).delay(1);
+        }
+
+
     }
+    g.init = function(){}
+    g.init();
 
 
 
@@ -28,6 +59,7 @@ $(function(){
     usi.user_info = $('.user_info');
     usi.profile_wrap = usi.user_info.find('.profile_wrap');
     usi.name = usi.user_info.find('#name');
+    usi.u = {}; // 存放获取到的用户相关信息
     usi.get_user_info = function(){
         $.ajax({
             type:'POST',
@@ -38,6 +70,7 @@ $(function(){
             success:function(data){
                 // if(!data){}
                 var _obj = JSON.parse(data);
+                usi.u = _obj;
                 if(_obj){
                     TweenMax.from(usi.name,.5,{ opacity:0 });
                     TweenMax.to(usi.name,.5,{ opacity:1 });
@@ -231,17 +264,26 @@ $(function(){
         // 文件双击事件
         cat.files_con.on('dblclick',function(e){
             var target = $(e.target).parents('.file');
+
+            // 如果当前文件夹被操作则取消双击事件
+            if (target[0].is_working == true) return false;
+
             if(target){
                 cat.build_nodes(target);
                 cat.build_breadcrumbs(target);
-                cat.checked_files = {};
+                cat.checked_files = {
+                    length:0
+                };
             }
         });
 
 
         // 文件点击事件
         cat.files_con.on('click',function(e){
-            var file = $(e.target).parents('.file');
+            var file = $(e.target).parents('.file')[0] ? $(e.target).parents('.file') : $(e.target);
+            // 如果当前文件夹被操作则取消点击事件
+            if (file[0].is_working == true ) return false;
+
             var checkbox = $(e.target).parent('.file_checkbox');
             file.toggleClass('file_active');
             if(checkbox[0]){
@@ -252,8 +294,9 @@ $(function(){
 
             var key = file.attr('act')+'_'+file.attr('files_id');
 
+            // console.log(cat.checked_files);
             if (cat.checked_files[key]){
-                cat.checked_files[key] = '';
+                delete cat.checked_files[key];
                 if (cat.checked_files.length > 0) cat.checked_files.length--;
             }else{
                 cat.checked_files[key] = {
@@ -298,67 +341,94 @@ $(function(){
     panel.panel_btns_other = $('.panel_btns_other');
     panel.rechristen = function(){
 
-        if (cat.checked_files.length != 1) return false; // 暂时只允许同时更改一个文件的名字
-
         var arr = [];
-        for (var key in cat.checked_files){
+        for (var key in cat.checked_files) {
             if (key == 'length') continue;
             arr.push(cat.checked_files[key]);
+            if(arr.length == 1) break;
         }
-        
+
+        // 设置先决条件,暂时这么写
+        if (cat.checked_files.length > 1){
+            g.tip('一次只能重命名一个文件夹');
+            return false;
+        } else if (cat.checked_files.length == 0) {
+            g.tip('请选择修改对象');
+            return false;
+        }
+
+        if (arr[0].id == 0 && usi.u.lv == 0) {
+            g.tip('您的权限不足，无法做出修改');
+            return false;
+        }
+
         var target = arr[0];
+        target.target[0].is_working = true;
         var e_filename = target.target.find('.filename');
         var e_filename_a = target.target.find('a');
-        e_filename_a.hide();
-        if (e_filename.find('.filename_input')){
-            
-        }
-        e_filename.append('\
-            <div class="filename_input">\
-                <input type="text">\
-                <i class="iconfont confirm" title="确认">&#xeb29;</i>\
-                <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
-            </div>\
-        ');
 
+        var o_filename_input = e_filename.find('.filename_input'),
+            o_input = null,
+            o_confirm_btn = null,
+            o_cancel_btn = null;
+
+        if (o_filename_input[0]) {
+            o_input = o_filename_input.find('input');
+            o_confirm_btn = o_filename_input.find('.confirm');
+            o_cancel_btn = o_filename_input.find('.cancel');
+        } else {
+            e_filename.append('\
+                <div class="filename_input">\
+                    <input type="text">\
+                    <i class="iconfont confirm" title="确认">&#xeb29;</i>\
+                    <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
+                </div>\
+            ');
+            o_filename_input = e_filename.find('.filename_input');
+            o_input = o_filename_input.find('input');
+            o_confirm_btn = o_filename_input.find('.confirm');
+            o_cancel_btn = o_filename_input.find('.cancel');
+        }
+
+
+        e_filename_a.hide();
+        o_filename_input.show();
         var pre_name = e_filename_a.html();
-        var o_filename_input = e_filename.find('.filename_input')
-        var o_input = o_filename_input.find('input');
-        var o_confirm_btn = o_filename_input.find('.confirm');
-        var o_cancel_btn = o_filename_input.find('.cancel');
         var now_name = '';
         o_input.val(pre_name);
         o_input.focus();
         
         o_confirm_btn.on('click',function(){
             now_name = o_input.val();
-            // console.log(o_input.val());
-            // console.log(e_filename_a.html());
             e_filename_a.html(now_name);
             e_filename_a.show();
             o_filename_input.hide();
+            target.target[0].is_working = false;
+            g.tip('正在重命名...',false);
+            console.log(target.id);
+            $.ajax({type: 'POST', url: 'php/handle/file.php',
+                data: {
+                    act: "rechristen",
+                    fid: g.id,
+                    id: target.id,
+                    method: g.method,
+                    type: 'folder',
+                    name: now_name
+                },
+                success: function (data) {
+                    document.body.innerHTML = data;
+                }
+            });
         });
 
+        o_cancel_btn.on('click', function () {
+            e_filename_a.show();
+            o_filename_input.hide();
+            target.target[0].is_working = false;
+        });
 
-        
-        // target
-
-        // $.ajax({
-        //     type:'POST',
-        //     url:'php/handle/file.php',
-        //     data:{
-        //         act:"rechristen",
-        //         fid:g.id,
-        //         method:g.method,
-        //         type:'folder',
-        //         name:''
-        //     },
-        //     success:function(data){
-                
-        //     }
-        // });
     };
-    //  云闲月赏花云闲月赏花云闲月赏花
+    
     panel.event = function(){
         panel.panel_btns.on('click',function(e){
             var _target = $(e.target).parents('a')[0] || $(e.target)[0];

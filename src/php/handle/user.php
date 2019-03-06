@@ -295,5 +295,6 @@ function checkLogged(){
 function userInfo(){
 	$result['sid'] = $_SESSION['sid'];
 	$result['username'] = $_SESSION['username'];
+	$result['lv'] = $_SESSION['lv'];
 	echo json_encode($result);
 }

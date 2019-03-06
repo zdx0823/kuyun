@@ -6,5 +6,9 @@
 // include_once('php/handle/data.php');
 // include_once('php/handle/backup.php');
 
+$old_filename='F:/phpStudy/PHPTutorial/WWW/kuyun/src/data/home/20177715114/测试文件夹-1';
+$new_filename='F:/phpStudy/PHPTutorial/WWW/kuyun/src/data/home/20177715114/bbbbbb';
+var_dump(dirname(dirname(__DIR__)));
+// rename(iconv('UTF-8','GBK',$old_filename), iconv('UTF-8','GBK',$new_filename));
+// rename($old_filename, $new_filename);
 
-touch("F:/phpStudy/PHPTutorial/WWW/kuyun/src/data/home/20177715114/abcdefg.txt");

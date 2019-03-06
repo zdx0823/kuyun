@@ -126,7 +126,7 @@ $(function(){
                             $.cookie('ky_account', obj.account.val(), { expires: 7 });
                             $.cookie('ky_password', obj.password.val(), { expires: 7 });
                         }
-                        window.location.href = 'http://localhost/kuyun/src/index.html';
+                        window.location.href = 'index.html';
                     }else if(status == 0){
                         obj.warn('帐号或密码错误');
                         obj.kill_input(false);
@@ -165,7 +165,7 @@ $(function(){
                             success:function(data){
                                 // 正常情况，成功跳转
                                 if(JSON.parse(data).status == 1){
-                                    window.location.href = 'http://localhost/kuyun/src/index.html';
+                                    window.location.href = 'index.html';
                                 }else{
                                 // 失败调出登录界面
                                     obj.load();
@@ -180,7 +180,7 @@ $(function(){
                     }
                 }else{
                     // 后台有记录，直接跳转
-                    window.location.href = 'http://localhost/kuyun/src/index.html';
+                    window.location.href = 'index.html';
                 }
             }
         });
