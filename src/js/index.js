@@ -21,13 +21,12 @@ $(function(){
     g.tip = function (words, condition){
         var words = words || '警告';
         var global_tip = $('#global_tip');
-        if (global_tip[0]){
-
-        }else{
+        if (!global_tip[0]) {
             global_tip = $('<p id="global_tip"></p>');
             $('.content').append(global_tip);
         }
-        
+        console.log(words);
+        console.log(condition);
         global_tip.html(words);
 
         global_tip.css('left', ($(window).width() - global_tip.width())/2 );
@@ -400,25 +399,39 @@ $(function(){
         
         o_confirm_btn.on('click',function(){
             now_name = o_input.val();
-            e_filename_a.html(now_name);
-            e_filename_a.show();
-            o_filename_input.hide();
-            target.target[0].is_working = false;
-            g.tip('正在重命名...',false);
-            console.log(target.id);
-            $.ajax({type: 'POST', url: 'php/handle/file.php',
-                data: {
-                    act: "rechristen",
-                    fid: g.id,
-                    id: target.id,
-                    method: g.method,
-                    type: 'folder',
-                    name: now_name
-                },
-                success: function (data) {
-                    document.body.innerHTML = data;
-                }
-            });
+            if(pre_name != now_name){
+                g.tip('正在重命名...', false);
+                $.ajax({type: 'POST', url: 'php/handle/file.php',
+                    data: {
+                        act: "rechristen",
+                        fid: g.id,
+                        id: target.id,
+                        method: g.method,
+                        type: 'folder',
+                        name: now_name
+                    },
+                    success: function (data) {
+                        var _obj = JSON.parse(data);
+                        var status = _obj.status;
+                        if (_obj.status == 1) {
+                            e_filename_a.html(now_name);
+                            e_filename_a.show();
+                            o_filename_input.hide();
+                            console.log(12345);
+                            g.tip('更改成功');
+                            target.target[0].is_working = false;
+                        } else{
+                            g.tip('更改失败');
+                        }
+                    }
+                });
+
+            } else {
+                e_filename_a.html(now_name);
+                e_filename_a.show();
+                o_filename_input.hide();
+                target.target[0].is_working = false;
+            }
         });
 
         o_cancel_btn.on('click', function () {

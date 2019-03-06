@@ -237,10 +237,6 @@ function rechristen(){
 		$relatedFolderPath[] = $newPath;
 
 		$res = rename(getCode($path), getCode($newPath));
-		echo '<pre>';
-		var_dump(dirname(dirname(__DIR__)));
-		var_dump($path);
-		var_dump($newPath);exit;
 
 		if ($res) {
 			$upd = "UPDATE `{$table}` SET `name` = '{$name}', `path` = '{$newPath}', `update_time` = {$time} WHERE `id` = {$id}";
