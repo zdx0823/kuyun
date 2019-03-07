@@ -668,7 +668,12 @@ $(function(){
             }
         }
     };
+    panel.upload_init = function(){
+        
+    };
+    panel.upload = function(){
 
+    };
     panel.event = function(){
         panel.panel_btns.on('click',function(e){
             var _target = $(e.target).parents('a')[0] || $(e.target)[0];
@@ -683,6 +688,9 @@ $(function(){
                     break;
                 case 'create':
                     panel.create();
+                    break;
+                case 'upload':
+                    panel.upload();
                     break;
             }
         });

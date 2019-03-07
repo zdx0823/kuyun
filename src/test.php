@@ -24,3 +24,4 @@ $db = new Db([
     'pass'=>'root'
 ]);
 
+var_dump($_FILES);
