@@ -18,6 +18,7 @@ $(function(){
         method:null,
         id:-1,
     };
+    // 全局提示语
     g.tip = function (words, condition){
         var words = words || '警告';
         var global_tip = $('#global_tip');
@@ -42,9 +43,11 @@ $(function(){
             }).delay(1);
         }
     };
+    // 全局确认删除对话框
     g.dialog = function (callback) {
         var words = words || '警告';
         var global_dialog = $('#global_dialog');
+        // 第一次则生成对话框
         if (!global_dialog[0]) {
             global_dialog = $('\
                 <div id="global_dialog">\
@@ -68,12 +71,16 @@ $(function(){
             close_btn = global_dialog.find('.close'),
             head = global_dialog.find('.head'),
             dialog = global_dialog.find('.dialog');
+        // 点击确认
         confirm_btn.on('click',function(){
             global_dialog.hide();
             callback && callback();
         });
+        // 点击取消
         cancel_btn.on('click',function(){ global_dialog.hide(); });
+        // 点击关闭按钮
         close_btn.on('click',function(){ global_dialog.hide(); });
+        // 按住对话框顶部进行拖动
         head.on('mousedown',function(e){
             var dis_x = e.pageX - dialog.offset().left;
             var dis_y = e.pageY - dialog.offset().top;
@@ -96,12 +103,8 @@ $(function(){
             });
         });
     };
-    g.task_list = {
-        create:null,
-        del:null,
-        rename:null
-    };
-
+    // 全局执行列表，同一时刻只允许执行一件事
+    g.task_list = [];
     g.init = function(){}
     g.init();
 
@@ -189,6 +192,14 @@ $(function(){
     // 暂存区，存放刚刚点击过的目录的html
     cat.ts = {};
 
+    // 存放目录的icon图标
+    cat.ii_path = {
+        folder: 'lib/coloursIcon/wenjian.png',
+        txt: 'lib/coloursIcon/txt.png',
+        unknown: 'lib/coloursIcon/unknown.png',
+    };
+
+    // 返回文件或文件夹的html字符串
     cat.file_html_str = function(argu){
         return  '\
         <div class="file" act="user" type="' + argu.type + '" files_id="' + argu.id + '" title="' + argu.name + '">\
@@ -197,12 +208,6 @@ $(function(){
             <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
         </div>';
     }
-
-    cat.ii_path = {
-        folder: 'lib/coloursIcon/wenjian.png',
-        txt: 'lib/coloursIcon/txt.png',
-        unknown: 'lib/coloursIcon/unknown.png',
-    };
 
     // 生成节点
     cat.build_nodes = function(target){
@@ -236,14 +241,15 @@ $(function(){
                 cat.files_con.html(cat.ts['all_-1']);
                 cat.files_loading.hide();
             }else{
+                // 请求数据
                 $.ajax({type:'POST', url:'php/handle/data.php', data:{ act:act, fid:fid }, success:function(data){
                     var obj = JSON.parse(data),
                         files = [obj.folder,obj.file],      // 这条语句谨慎更改
                         ii_path = cat.ii_path;
                     var nodes = '';
 
+                    // 遍历生成节点
                     if(obj.folder || obj.file){
-
                         $.each(files,function(i,list){
                             $.each(list,function(j,item){
                                 var id = item.id,
@@ -257,16 +263,12 @@ $(function(){
                                 }else{
                                     icon = ii_path[ext] ? ii_path[ext] : ii_path.unknown;
                                 }
-                                nodes += cat.file_html_str({
-                                    type:type,
-                                    id:id,
-                                    name:name,
-                                    icon:icon
-                                })
+                                nodes += cat.file_html_str({type:type, id:id, name:name, icon:icon });
                             });
                         });
                         
                     }else{
+                        // 空
                         nodes = 
                         '\
                             <p class="files_empty">\
@@ -275,7 +277,8 @@ $(function(){
                             </p>\
                         '; 
                     }
-   
+
+                    // 记录到暂存区
                     cat.ts[sign] = nodes;
                     cat.files_con.html(nodes);
                     cat.files_loading.hide();
@@ -327,14 +330,13 @@ $(function(){
         length:0
     };
 
-
     // 各种事件
     cat.event = function(){
         // 文件双击事件
         cat.files_con.on('dblclick',function(e){
 
             // 如果有正在处理的事务，禁止单击
-            if (g.task_list.create || g.task_list.rename || g.task_list.del) return false;
+            if (g.task_list.length) return false;
 
             var target = $(e.target).parents('.file');
 
@@ -353,9 +355,9 @@ $(function(){
 
         // 文件点击事件
         cat.files_con.on('click',function(e){
-            
+            console.log(g.task_list.length);
             // 如果有正在处理的事务，禁止单击
-            if (g.task_list.create || g.task_list.rename || g.task_list.del) return false;
+            if (g.task_list.length) return false;
 
             var file = $(e.target).parents('.file')[0] ? $(e.target).parents('.file') : $(e.target);
 
@@ -382,36 +384,29 @@ $(function(){
                 };
                 cat.checked_files.length++;
             }
-            console.log(cat.checked_files);
 
         });
 
-
-        // 面包屑
+        // 面包屑事件
         cat.breadcrumbs.on('click',function(e){
             cat.build_nodes($(e.target));
             cat.build_breadcrumbs($(e.target),'back');
         });
 
-        // cat.file_checkbox.on('click',function(e){
-        //     console.log('cat.file_checkbox');
-        //     e.stopPropagation();
-        // });
     };
 
     // 初始化
     cat.init = function(){
-
         if(!cat.files_loading.html()){
             cat.files_loading.append(cat.svg_loading({size:40,color:'#8bc34a'}));
         }
         cat.build_nodes('all_-1');
         cat.event();
     };
-
     cat.init();
 
 
+    
     var panel = {};
     panel.panel_btns = $('.panel_btns');
     panel.panel_btns_small = $('.panel_btns_small');
@@ -446,13 +441,16 @@ $(function(){
         }
     };
     panel.rechristen = function(){
-        console.log(cat.checked_files);
+        
         var arr = [];
         for (var key in cat.checked_files) {
             if (key == 'length') continue;
             arr.push(cat.checked_files[key]);
             if(arr.length == 1) break;
         }
+
+        // 有事件正在执行，返回false
+        if(g.task_list.length) return false;
 
         // 设置先决条件,暂时这么写
         if (cat.checked_files.length > 1){
@@ -470,7 +468,8 @@ $(function(){
 
         var target = arr[0];
 
-        g.task_list.rename = target.target;
+        // 占位
+        g.task_list.push({ name: 'rename', target: target.target });
 
         var e_filename = target.target.find('.filename');
         var e_filename_a = target.target.find('a');
@@ -506,7 +505,8 @@ $(function(){
                                     e_filename_a.show();
                                     o_filename_input.hide();
                                     g.tip('更改成功');
-                                    g.task_list.rename = null;
+                                    // 离位
+                                    g.task_list.pop();
                                 } else {
                                     g.tip('更改失败');
                                     o_input.val(pre_name);
@@ -518,13 +518,15 @@ $(function(){
                         e_filename_a.html(now_name);
                         e_filename_a.show();
                         o_filename_input.hide();
-                        g.task_list.rename = null;
+                        // 离位
+                        g.task_list.pop();
                     }
                 },
                 cancel:function(){
                     e_filename_a.show();
                     o_filename_input.hide();
-                    g.task_list.rename = null;
+                    // 离位
+                    g.task_list.pop();
                 }
             });
             o_filename_input = obj.o_filename_input;
@@ -553,10 +555,12 @@ $(function(){
             arr.push(_arr);
         }
         if (obj.length != 0) {
-            g.dialog(function () {
-                g.tip('正在删除...', false);
-                $.ajax({type: 'POST', url: 'php/handle/file.php', data:{ act:"del",method:0,data:arr},success:function(data){
+            // 占位
+            g.task_list.push({ name:'del', target: arr });
 
+            g.dialog(function () {
+                g.tip('正在删除...,注意是硬删除', false);
+                $.ajax({type: 'POST', url: 'php/handle/file.php', data:{ act:"del",method:1,func:'del',data:arr},success:function(data){
                     var obj = JSON.parse(data);
                     if (obj.status == 1) {
                         g.tip('删除成功');
@@ -567,45 +571,25 @@ $(function(){
                     } else {
                         g.tip('删除失败');
                     }
-
                 }});
             });
         }
     };
     panel.create = function(){
-        if (g.task_list.create){
-            TweenMax.to(g.task_list.create, .1,{opacity:0});
-            TweenMax.to(g.task_list.create, .1,{opacity:1}).delay(.1);
+        
+        if (g.task_list.length) {
+            console.log(g.task_list);
+            // 双闪提示
+            TweenMax.to(g.task_list[0].target, .1, { opacity: 0 });
+            TweenMax.to(g.task_list[0].target, .1, { opacity: 1 }).delay(.1);
             return false;
-        };
-        // 清除对应的属性
-        cat.checked_files = { length: 0 };
-        // 清除正在处理的重命名事务
-        if (g.task_list.rename){
-            // 节点设置
-            g.task_list.rename.removeClass('file_active');
-            g.task_list.rename.find('.file_checkbox').removeClass('file_checkbox_ed');
-            var e_filename = g.task_list.rename.find('.filename');
-            e_filename.find('a').show();
-            e_filename.find('.filename_input').hide();
 
-            // 清除重命名事务
-            g.task_list.rename = null;
-        }
+        } else if (g.method != null && g.id != -1) { // 全局环境下的暂时无人可操作
+            
+            // 默认文件名，i作为区别后缀
+            var name = '新建文件夹', i = 0;
 
-        // 清除当前被选中的节点
-        var clecked_files = cat.files_con.find('.file_active');
-        clecked_files.find('.file_checkbox_ed').removeClass('file_checkbox_ed');
-        clecked_files.removeClass('file_active');
-
-        var method = g.method;
-        var id = g.id;
-        if(method != null && id != -1){
-            // panel.build_rename_nodes();
-
-            var name = '新建文件夹',
-                i = 0;
-
+            // 生成新的文件或文件夹节点
             var file = $(
                 cat.file_html_str({
                     type:'folder',  // 暂时只能新建文件夹
@@ -614,64 +598,74 @@ $(function(){
                     icon:cat.ii_path.folder
                 })
             );
-            g.task_list.create = file;
+
+            // 占位
+            g.task_list.push({ name: 'create', target: file });
+
+            // 清除当前被选中的节点
+            var clecked_files = cat.files_con.find('.file_active');
+            clecked_files.find('.file_checkbox_ed').removeClass('file_checkbox_ed');
+            clecked_files.removeClass('file_active');
+            // 清除存储的属性
+            cat.checked_files = { length: 0 };
 
             cat.files_con.prepend(file);
             var e_filename = file.find('.filename');
 
-            var obj = panel.build_rename_nodes(e_filename,{
+            // 新建文件时特有的确认事件回调和取消事件回调
+            var res_obj = panel.build_rename_nodes(e_filename,{
                 comfirm: function (e) {
+                    // 防止按钮被确定按钮被重复点击
+                    if($(this).data('lock')) return false;
+                    $(this).data('lock',true);
+
+                    // 调用提示语，发起请求
                     g.tip('正在创建...',false);
                     _tmp(name);
-                    // 清除相关事务
-                    g.task_list.create = null;
-                    e.stopPropagation();
                 },
-                cancel:function(e){
+                cancel: function (e) {
+                    // 防止在请求新建文件时候被点击取消
+                    if ($(this).data('lock')) return false;
                     file.remove();
-                    // 清除相关事务
-                    g.task_list.create = null;
-                    e.stopPropagation();
+                    // 离位
+                    g.task_list.pop();
                 }
-
             });
-            var o_input = obj.o_input;
+
+            // 让文本框文字被选中
+            var o_input = res_obj.o_input;
             o_input.val(name);
             o_input.focus();
             o_input.select();
 
-            function _tmp(name,callback) {
-                $.ajax({
-                    type: 'POST', url: 'php/handle/file.php',
-                    data: {
-                        act: "create",
-                        fid: g.id,
-                        method: g.method,
-                        type: 'folder',
-                        name: name
-                    },
+            function _tmp(name) {
+                $.ajax({type: 'POST', url: 'php/handle/file.php', data: {act: "create", fid: g.id, method: g.method, type: 'folder', name: name },
                     success: function (data) {
                         var obj = JSON.parse(data);
                         if (obj.status == 1){
+                            // 调用提示语
                             g.tip('创建成功');
+                            // 填入成功后的文件名，隐藏文本框，显示a标签
                             e_filename.find('a').html(name);
-                            // 下面两句可以考虑抽象成方法
                             e_filename.find('a').show();
                             e_filename.find('.filename_input').hide();
+                            // 清除相关事务
+                            g.task_list.pop();
                         } else if (obj.status == 2 && i <= 20){ // 不允许连续超过20次的ajax请求
+                            // 自动生成新的名称并再次发起请求
                             i = i+1;
                             name = '新建文件夹'+i;
                             _tmp(name);
                         } else if (obj.status == 3) {
                             g.tip('用户权限不足');
-                        } else {
+                            $(this).data('lock',false);
+                        } else if (obj.status == 4){
                             g.tip('创建失败');
+                            $(this).data('lock',false);
                         }
-                        g.task_list.create = null;
                     }
                 });
             }
-
         }
     };
 

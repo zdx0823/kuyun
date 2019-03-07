@@ -7,21 +7,243 @@
     <title>Document</title>
 
 <script src="lib/jquery-3.3.1.js"></script>
+<script src="lib/webuploader.min.js"></script>
 </head>
 <body>
-    <input type="text" value="测试测试测试.txt">
+    
+    
+<div id="picker" style="float: left;">选择文件</div>
+<input type="button" value="上传" id="ctlBtn">
+
 <script>
 
 $(function(){
 
 
-    var input = $('input');
-    var val = input.val();
-    input[0].focus();
-    input[0].selectionStart = 0;
-    // console.log(val.length);
-    input[0].selectionEnd = val.lastIndexOf('.');
+    // var input = $('input');
+    // var val = input.val();
+    // input[0].focus();
+    // input[0].selectionStart = 0;
+    // // console.log(val.length);
+    // input[0].selectionEnd = val.lastIndexOf('.');
 
+
+
+    // var uploader = WebUploader.create({
+    //     // swf: '/public/images/Uploader.swf',
+    //     server: 'php/handle/file.php',
+    //     pick: {
+    //         id: '#picker',
+    //         multiple: true
+    //     },
+    //     chunked: true,		// 分片
+    //     threads: 1,			// 并发数
+    //     fileNumLimit: 5,
+    //     accept: {
+    //         extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
+    //     },
+    //     formData: {
+    //         act: 'upload',
+    //         fid: 26,
+    //         method: 'user'
+    //     }
+    // });
+    // uploader.upload();
+
+    // var uploader = WebUploader.create({
+    //     // server: 'php/handle/file.php',
+    //     pick: {
+    //         id: '#picker',
+    //         innerHTML:'上传',
+    //         multiple: true
+    //     },
+    //     chunked: true,		// 分片
+    //     threads: 1,			// 并发数
+    //     fileNumLimit: 5,
+    //     chunkRetry: 50,
+    //     accept: {
+    //         extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
+    //     },
+    //     formData: {
+    //         act: 'upload',
+    //         fid: 26,
+    //         method: 'user'
+    //     },
+    //     auto:true,
+    //     prepareNextFile:true,
+    //     method:'POST'
+        
+    // });
+    // uploader.on('fileQueued',function(file){
+    //     console.log(file);
+    // });
+    // uploader.on('uploadAccept',function(object,res){
+    //     console.log(res);
+    // });
+    // uploader.on('uploadProgress',function(file, percentage){
+    //     console.log(percentage);
+    // });
+
+
+
+    var uploader = WebUploader.create({
+        server: 'php/handle/file.php',
+        pick: {
+            id: '#picker',
+            multiple: true
+        },
+        chunked: true,		// 分片
+        threads: 1,			// 并发数
+        fileNumLimit: 5,
+        accept: {
+            extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
+        },
+        formData: {
+            act: 'upload',
+            fid: 26,
+            method: 'user'
+        }
+    });
+
+    // 上传提交
+    $("#ctlBtn").click(function () {
+        uploader.upload();
+    });
+
+    // 当有文件被添加进队列的时候-md5序列化
+    uploader.on('fileQueued', function (file) {
+        // 文件上传验证
+        $.post('php/handle/file.php', {
+            act: 'checkFile',
+            fid: 26,
+            method: 'user',
+            name: file.name
+        }, function (data) {
+            var res = $.parseJSON(data);
+            var msg = null;
+
+            if (res.status != 0) {
+                if (res.status == 1) {
+                    msg = '用户权限不足';
+                } else if (res.status == 2) {
+                    msg = '文件已在私有目录中';
+                } else if (res.status == 3) {
+                    msg = '文件已在课业目录中';
+                } else if (res.status == 4) {
+                    msg = '文件已在公共目录中';
+                } else if (res.status == 5) {
+                    msg = '文件已在回收站中';
+                }
+                uploader.removeFile(file);
+            } else {
+                uploader.md5File(file)
+
+                    .then(function (fileMd5) {
+                        
+                        file.wholeMd5 = fileMd5;
+                        file_md5 = fileMd5;
+
+                        // 检查是否有已经上传成功的分片文件
+                        $.post('php/handle/file.php', { act: 'checkBlock', md5: file_md5 }, function (data) {
+                            var res = $.parseJSON(data);
+
+                            // 如果有对应的分片，推入数组
+                            // if (res.block_info) {
+                            //     for (var i in res.block_info) {
+                            //         block_info.push(res.block_info[i]);
+                            //     }
+                            // }
+                            console.log(res);
+                        });
+                    });
+            }
+        });
+    });
+
+
+
+    // // 发送前检查分块,并附加MD5数据
+    // uploader.on('uploadBeforeSend', function (block, data) {
+    //     var file = block.file;
+    //     var deferred = WebUploader.Deferred();
+
+    //     data.md5value = file.wholeMd5;
+    //     data.status = file.status;
+
+    //     if ($.inArray(block.chunk.toString(), block_info) >= 0) {
+    //         deferred.reject();
+    //         deferred.resolve();
+    //         return deferred.promise();
+    //     }
+    // });
+
+
+
+    // 文件上传过程中创建进度条实时显示。
+    uploader.on('uploadProgress', function (file, percentage) {
+        console.log(percentage);
+    });
+
+    // 上传出错处理
+    uploader.on('uploadError', function (file) {
+        uploader.retry();
+    });
+
+    // 上传完成后触发
+    uploader.on('uploadSuccess', function (file, response) {
+        var msg = null;
+
+        // 整理分片
+        $.post('php/handle/file.php', {
+            act: 'merge',
+            md5: file.wholeMd5,
+            name: file.name,
+            fid: 26,
+            method: 'user',
+            cid: 0
+        }, function (data) {
+            var res = $.parseJSON(data);
+            if (res.code == 0) {
+                $('.btns').text('');
+                $.post('../handle/file.php', {
+                    act: 'uploadSuccess',
+                    fid: 26,
+                    method: 'user',
+                    cid: 0,
+                    name: file.name,
+                    size: file.size
+                }, function (data) {
+                    var res = $.parseJSON(data);
+                    console.log(res);
+                })
+            }
+        });
+    });
+
+    // // 文件验证出错触发
+    // uploader.on('error', function (type) {
+    //     if (type == 'Q_EXCEED_NUM_LIMIT') {
+    //         layer.msg('文件总数不能超过5个', { time: 1500 });
+    //     } else if (type == 'Q_TYPE_DENIED') {
+    //         layer.msg('该文件类型不能上传', { time: 1500 });
+    //     }
+    // });
+
+    // // 中断当前文件上传
+    // function del(obj) {
+    //     uploader.cancelFile($(obj).parents('tr').attr('id'));
+    //     $(obj).parents('tr').remove();
+    // }
+
+
+
+
+
+
+
+
+    
+    // uploader.upload();
 
 
 
