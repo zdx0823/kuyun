@@ -96,6 +96,11 @@ $(function(){
             });
         });
     };
+    g.task_list = {
+        create:null,
+        del:null,
+        rename:null
+    };
 
     g.init = function(){}
     g.init();
@@ -184,6 +189,21 @@ $(function(){
     // 暂存区，存放刚刚点击过的目录的html
     cat.ts = {};
 
+    cat.file_html_str = function(argu){
+        return  '\
+        <div class="file" act="user" type="' + argu.type + '" files_id="' + argu.id + '" title="' + argu.name + '">\
+            <div class="icon_img"><img src="'+ argu.icon + '" alt=""></div>\
+            <div class="filename"><a href="javascript:;">'+ argu.name + '</a></div>\
+            <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
+        </div>';
+    }
+
+    cat.ii_path = {
+        folder: 'lib/coloursIcon/wenjian.png',
+        txt: 'lib/coloursIcon/txt.png',
+        unknown: 'lib/coloursIcon/unknown.png',
+    };
+
     // 生成节点
     cat.build_nodes = function(target){
 
@@ -219,11 +239,7 @@ $(function(){
                 $.ajax({type:'POST', url:'php/handle/data.php', data:{ act:act, fid:fid }, success:function(data){
                     var obj = JSON.parse(data),
                         files = [obj.folder,obj.file],      // 这条语句谨慎更改
-                        ii_path = {
-                            folder:'lib/coloursIcon/wenjian.png',
-                            txt:'lib/coloursIcon/txt.png',
-                            unknown:'lib/coloursIcon/unknown.png',
-                        };
+                        ii_path = cat.ii_path;
                     var nodes = '';
 
                     if(obj.folder || obj.file){
@@ -241,12 +257,12 @@ $(function(){
                                 }else{
                                     icon = ii_path[ext] ? ii_path[ext] : ii_path.unknown;
                                 }
-                                nodes += 
-                                    '<div class="file" act="user" type="'+type+'" files_id="'+id+'" title="'+name+'">\
-                                    <div class="icon_img"><img src="'+icon+'" alt=""></div>\
-                                    <div class="filename"><a href="javascript:;">'+name+'</a></div>\
-                                    <div class="file_checkbox"><i class="iconfont">&#xeb26;</i></div>\
-                                </div>';
+                                nodes += cat.file_html_str({
+                                    type:type,
+                                    id:id,
+                                    name:name,
+                                    icon:icon
+                                })
                             });
                         });
                         
@@ -316,6 +332,10 @@ $(function(){
     cat.event = function(){
         // 文件双击事件
         cat.files_con.on('dblclick',function(e){
+
+            // 如果有正在处理的事务，禁止单击
+            if (g.task_list.create || g.task_list.rename || g.task_list.del) return false;
+
             var target = $(e.target).parents('.file');
 
             // 如果当前文件夹被操作则取消双击事件
@@ -333,9 +353,11 @@ $(function(){
 
         // 文件点击事件
         cat.files_con.on('click',function(e){
+            
+            // 如果有正在处理的事务，禁止单击
+            if (g.task_list.create || g.task_list.rename || g.task_list.del) return false;
+
             var file = $(e.target).parents('.file')[0] ? $(e.target).parents('.file') : $(e.target);
-            // 如果当前文件夹被操作则取消点击事件
-            if (file[0].is_working == true ) return false;
 
             var checkbox = $(e.target).parent('.file_checkbox');
             file.toggleClass('file_active');
@@ -347,7 +369,7 @@ $(function(){
 
             var key = file.attr('act')+'_'+file.attr('files_id');
 
-            // console.log(cat.checked_files);
+            
             if (cat.checked_files[key]){
                 delete cat.checked_files[key];
                 if (cat.checked_files.length > 0) cat.checked_files.length--;
@@ -360,6 +382,7 @@ $(function(){
                 };
                 cat.checked_files.length++;
             }
+            console.log(cat.checked_files);
 
         });
 
@@ -393,8 +416,37 @@ $(function(){
     panel.panel_btns = $('.panel_btns');
     panel.panel_btns_small = $('.panel_btns_small');
     panel.panel_btns_other = $('.panel_btns_other');
-    panel.rechristen = function(){
+    panel.build_rename_nodes = function(parent,callback){
+        parent.append('\
+                <div class="filename_input">\
+                    <input type="text" spellcheck="false">\
+                    <i class="iconfont confirm" title="确认">&#xeb29;</i>\
+                    <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
+                </div>\
+            ');
+        var o_filename_input = parent.find('.filename_input'),
+            o_input = o_filename_input.find('input'),
+            o_confirm_btn = o_filename_input.find('.confirm'),
+            o_cancel_btn = o_filename_input.find('.cancel');
 
+        o_confirm_btn.off('click'); // 防止重复绑定事件
+        o_confirm_btn.on('click', function(e){
+            callback.comfirm && callback.comfirm(e);
+        });
+
+        o_cancel_btn.on('click', function (e) {
+            callback.cancel && callback.cancel(e);
+        });
+        
+        return {
+            o_filename_input: o_filename_input,
+            o_input: o_input,
+            o_confirm_btn: o_confirm_btn,
+            o_cancel_btn: o_cancel_btn
+        }
+    };
+    panel.rechristen = function(){
+        console.log(cat.checked_files);
         var arr = [];
         for (var key in cat.checked_files) {
             if (key == 'length') continue;
@@ -417,7 +469,9 @@ $(function(){
         }
 
         var target = arr[0];
-        target.target[0].is_working = true;
+
+        g.task_list.rename = target.target;
+
         var e_filename = target.target.find('.filename');
         var e_filename_a = target.target.find('a');
 
@@ -431,19 +485,51 @@ $(function(){
             o_confirm_btn = o_filename_input.find('.confirm');
             o_cancel_btn = o_filename_input.find('.cancel');
         } else {
-            e_filename.append('\
-                <div class="filename_input">\
-                    <input type="text" spellcheck="false">\
-                    <i class="iconfont confirm" title="确认">&#xeb29;</i>\
-                    <i class="iconfont cancel" title="取消">&#xeb2c;</i>\
-                </div>\
-            ');
-            o_filename_input = e_filename.find('.filename_input');
-            o_input = o_filename_input.find('input');
-            o_confirm_btn = o_filename_input.find('.confirm');
-            o_cancel_btn = o_filename_input.find('.cancel');
-        }
+            var obj = panel.build_rename_nodes(e_filename,{
+                comfirm:function(){
+                    now_name = o_input.val();
+                    if (pre_name != now_name) {
+                        g.tip('正在重命名...', false);
+                        $.ajax({ type: 'POST', url: 'php/handle/file.php', 
+                            data: {
+                                act: "rechristen",
+                                fid: g.id,
+                                id: target.id,
+                                method: g.method,
+                                type: target.type,
+                                name: now_name
+                            },
+                            success: function (data) {
+                                var _obj = JSON.parse(data);
+                                if (_obj.status == 1) {
+                                    e_filename_a.html(now_name);
+                                    e_filename_a.show();
+                                    o_filename_input.hide();
+                                    g.tip('更改成功');
+                                    g.task_list.rename = null;
+                                } else {
+                                    g.tip('更改失败');
+                                    o_input.val(pre_name);
+                                }
+                            }
+                        });
 
+                    } else {
+                        e_filename_a.html(now_name);
+                        e_filename_a.show();
+                        o_filename_input.hide();
+                        g.task_list.rename = null;
+                    }
+                },
+                cancel:function(){
+                    e_filename_a.show();
+                    o_filename_input.hide();
+                    g.task_list.rename = null;
+                }
+            });
+            o_filename_input = obj.o_filename_input;
+            o_input = obj.o_input;
+        }
 
         e_filename_a.hide();
         o_filename_input.show();
@@ -454,51 +540,6 @@ $(function(){
         o_input[0].selectionStart = 0;
         o_input[0].selectionEnd = o_input.val().lastIndexOf('.');
         
-        
-        o_confirm_btn.off('click'); // 防止重复绑定事件
-        o_confirm_btn.on('click',function(){
-            
-            now_name = o_input.val();
-            if(pre_name != now_name){
-                g.tip('正在重命名...', false);
-                $.ajax({type: 'POST', url: 'php/handle/file.php',
-                    data: {
-                        act: "rechristen",
-                        fid: g.id,
-                        id: target.id,
-                        method: g.method,
-                        type: target.type,
-                        name: now_name
-                    },
-                    success: function (data) {
-                        var _obj = JSON.parse(data);
-                        if (_obj.status == 1) {
-                            e_filename_a.html(now_name);
-                            e_filename_a.show();
-                            o_filename_input.hide();
-                            g.tip('更改成功');
-                            target.target[0].is_working = false;
-                        } else{
-                            g.tip('更改失败');
-                            o_input.val(pre_name);
-                        }
-                    }
-                });
-
-            } else {
-                e_filename_a.html(now_name);
-                e_filename_a.show();
-                o_filename_input.hide();
-                target.target[0].is_working = false;
-            }
-        });
-
-        o_cancel_btn.on('click', function () {
-            e_filename_a.show();
-            o_filename_input.hide();
-            target.target[0].is_working = false;
-        });
-
     };
     panel.del = function(){
         var obj = cat.checked_files;
@@ -512,8 +553,8 @@ $(function(){
             arr.push(_arr);
         }
         if (obj.length != 0) {
-            g.tip('正在删除...', false);
-            g.dialog(function(){
+            g.dialog(function () {
+                g.tip('正在删除...', false);
                 $.ajax({type: 'POST', url: 'php/handle/file.php', data:{ act:"del",method:0,data:arr},success:function(data){
 
                     var obj = JSON.parse(data);
@@ -531,7 +572,108 @@ $(function(){
             });
         }
     };
+    panel.create = function(){
+        if (g.task_list.create){
+            TweenMax.to(g.task_list.create, .1,{opacity:0});
+            TweenMax.to(g.task_list.create, .1,{opacity:1}).delay(.1);
+            return false;
+        };
+        // 清除对应的属性
+        cat.checked_files = { length: 0 };
+        // 清除正在处理的重命名事务
+        if (g.task_list.rename){
+            // 节点设置
+            g.task_list.rename.removeClass('file_active');
+            g.task_list.rename.find('.file_checkbox').removeClass('file_checkbox_ed');
+            var e_filename = g.task_list.rename.find('.filename');
+            e_filename.find('a').show();
+            e_filename.find('.filename_input').hide();
 
+            // 清除重命名事务
+            g.task_list.rename = null;
+        }
+
+        // 清除当前被选中的节点
+        var clecked_files = cat.files_con.find('.file_active');
+        clecked_files.find('.file_checkbox_ed').removeClass('file_checkbox_ed');
+        clecked_files.removeClass('file_active');
+
+        var method = g.method;
+        var id = g.id;
+        if(method != null && id != -1){
+            // panel.build_rename_nodes();
+
+            var name = '新建文件夹',
+                i = 0;
+
+            var file = $(
+                cat.file_html_str({
+                    type:'folder',  // 暂时只能新建文件夹
+                    id:'underfined',
+                    name: name,
+                    icon:cat.ii_path.folder
+                })
+            );
+            g.task_list.create = file;
+
+            cat.files_con.prepend(file);
+            var e_filename = file.find('.filename');
+
+            var obj = panel.build_rename_nodes(e_filename,{
+                comfirm: function (e) {
+                    g.tip('正在创建...',false);
+                    _tmp(name);
+                    // 清除相关事务
+                    g.task_list.create = null;
+                    e.stopPropagation();
+                },
+                cancel:function(e){
+                    file.remove();
+                    // 清除相关事务
+                    g.task_list.create = null;
+                    e.stopPropagation();
+                }
+
+            });
+            var o_input = obj.o_input;
+            o_input.val(name);
+            o_input.focus();
+            o_input.select();
+
+            function _tmp(name,callback) {
+                $.ajax({
+                    type: 'POST', url: 'php/handle/file.php',
+                    data: {
+                        act: "create",
+                        fid: g.id,
+                        method: g.method,
+                        type: 'folder',
+                        name: name
+                    },
+                    success: function (data) {
+                        var obj = JSON.parse(data);
+                        if (obj.status == 1){
+                            g.tip('创建成功');
+                            e_filename.find('a').html(name);
+                            // 下面两句可以考虑抽象成方法
+                            e_filename.find('a').show();
+                            e_filename.find('.filename_input').hide();
+                        } else if (obj.status == 2 && i <= 20){ // 不允许连续超过20次的ajax请求
+                            i = i+1;
+                            name = '新建文件夹'+i;
+                            _tmp(name);
+                        } else if (obj.status == 3) {
+                            g.tip('用户权限不足');
+                        } else {
+                            g.tip('创建失败');
+                        }
+                        g.task_list.create = null;
+                    }
+                });
+            }
+
+        }
+    };
 
     panel.event = function(){
         panel.panel_btns.on('click',function(e){
@@ -544,6 +686,9 @@ $(function(){
                     break;
                 case 'del':
                     panel.del();
+                    break;
+                case 'create':
+                    panel.create();
                     break;
             }
         });
