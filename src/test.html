@@ -5,7 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
+<style>
 
+#shade{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    border:5px dashed #999;
+    box-sizing: border-box;
+    display: none;
+}
+
+</style>
 <script src="lib/jquery-3.3.1.js"></script>
 <script src="lib/webuploader.min.js"></script>
 </head>
@@ -15,29 +28,20 @@
 <div id="picker" style="float: left;">选择文件</div>
 <input type="button" value="上传" id="ctlBtn">
 <div id="div"></div>
+
+<div id="shade"></div>
+
 <script>
 
 $(function(){
 
     // console.log($('document'));
 
-    document.addEventListener("drop", function (e) {  //拖离   
-        console.log('拖离');
-        console.log(e.dataTransfer.files);
-        e.preventDefault();
-    })
-    document.addEventListener("dragleave", function (e) {  //拖后放 
-        console.log('拖后放');  
-        e.preventDefault();
-    })
-    document.addEventListener("dragenter", function (e) {  //拖进  
-        console.log('拖进');  
-        e.preventDefault();
-    })
-    document.addEventListener("dragover", function (e) {  //拖来拖去  
-        console.log('拖来拖去');    
-        e.preventDefault();
-    })
+
+
+
+
+
 
 
 
@@ -48,63 +52,28 @@ $(function(){
     // // console.log(val.length);
     // input[0].selectionEnd = val.lastIndexOf('.');
 
+    var shade = $('#shade');
 
-
-    // var uploader = WebUploader.create({
-    //     // swf: '/public/images/Uploader.swf',
-    //     server: 'php/handle/file.php',
-    //     pick: {
-    //         id: '#picker',
-    //         multiple: true
-    //     },
-    //     chunked: true,		// 分片
-    //     threads: 1,			// 并发数
-    //     fileNumLimit: 5,
-    //     accept: {
-    //         extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
-    //     },
-    //     formData: {
-    //         act: 'upload',
-    //         fid: 26,
-    //         method: 'user'
-    //     }
-    // });
-    // uploader.upload();
-
-    // var uploader = WebUploader.create({
-    //     // server: 'php/handle/file.php',
-    //     pick: {
-    //         id: '#picker',
-    //         innerHTML:'上传',
-    //         multiple: true
-    //     },
-    //     chunked: true,		// 分片
-    //     threads: 1,			// 并发数
-    //     fileNumLimit: 5,
-    //     chunkRetry: 50,
-    //     accept: {
-    //         extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
-    //     },
-    //     formData: {
-    //         act: 'upload',
-    //         fid: 26,
-    //         method: 'user'
-    //     },
-    //     auto:true,
-    //     prepareNextFile:true,
-    //     method:'POST'
-        
-    // });
-    // uploader.on('fileQueued',function(file){
-    //     console.log(file);
-    // });
-    // uploader.on('uploadAccept',function(object,res){
-    //     console.log(res);
-    // });
-    // uploader.on('uploadProgress',function(file, percentage){
-    //     console.log(percentage);
-    // });
-
+    $(document).on("drop", function (e) {  //释放   
+        // console.log('释放');
+        shade.hide();
+        e.preventDefault();
+    });
+    shade.on("dragleave", function (e) {  //拖后放 
+        // console.log('拖后放');  
+        shade.hide();
+        e.preventDefault();
+    })
+    $(document).on("dragenter", function (e) {  //拖进  
+        console.log('拖进');  
+        shade.show();
+        e.preventDefault();
+    })
+    // $(document).on("dragover", function (e) {  //拖来拖去  
+    //     console.log('拖来拖去');  
+    //     // shade.show();  
+    //     e.preventDefault();
+    // })
 
     var file_md5 = '';		// 用于MD5校验文件
     var block_info = [];	// 用于跳过已有上传分片
@@ -124,8 +93,8 @@ $(function(){
         },
         formData: {
             act: 'upload',
-            fid: $('input[type=hidden]').eq(0).val(),
-            method: $('input[type=hidden]').eq(1).val()
+            fid: 29,
+            method: 'user'
         },
         disableGlobalDnd:false
     });
@@ -140,7 +109,7 @@ $(function(){
         // 文件上传验证
         $.post('php/handle/file.php', {
             act: 'checkFile',
-            fid: 26,
+            fid: 29,
             method: 'user',
             name: file.name
         }, function (data) {
@@ -220,7 +189,7 @@ $(function(){
             act: 'merge',
             md5: file.wholeMd5,
             name: file.name,
-            fid: 26,
+            fid: 29,
             method: 'user',
             // cid: 
         }, function (data) {
@@ -230,12 +199,13 @@ $(function(){
                 
                 $.post('php/handle/file.php', {
                     act: 'uploadSuccess',
-                    fid: 26,
+                    fid: 29,
                     method: 'user',
                     // cid: $('input[type=hidden]').eq(2).val(),
                     name: file.name,
                     size: file.size
                 }, function (data) {
+                    console.log(data);
                     var res = $.parseJSON(data);
                     var msg = null;
                     var color = null;
@@ -259,6 +229,23 @@ $(function(){
             console.log('该文件类型不能上传');
         }
     });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     // // 中断当前文件上传
@@ -303,7 +290,7 @@ $(function(){
     //     data: {
     //         act: "rechristen",
     //         fid: 0,
-    //         id: 26,
+    //         id: 29,
     //         method: 'user',
     //         type: 'folder',
     //         name: 'abcdefg'

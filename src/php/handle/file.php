@@ -954,7 +954,7 @@ function uploadSuccess(){
 		$ins = "INSERT INTO `".PREFIX.FILE."` (`uid`, `fid`, `name`, `path`, `size`, `create_time`, `update_time`, `is_les`) VALUES ({$uid}, {$fid}, '{$name}', '{$path}', {$size}, {$time}, {$time}, {$cid})";
 	}
 	$sql = mysql_query($ins);
-	var_dump($sql);
+
 	// 更新目录大小
 	while ($fid > 0){
 		$sel = "SELECT `fid` FROM `".PREFIX.FOLDER."` WHERE `id` = {$fid}";

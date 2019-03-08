@@ -406,6 +406,141 @@ $(function(){
     cat.init();
 
 
+
+    var up = {};
+    up.init = function(){
+  
+        this.file_md5 = '';		// 用于MD5校验文件
+        this.block_info = [];	// 用于跳过已有上传分片
+
+        this.uploader = WebUploader.create({
+            dnd:$(document),
+            server: 'php/handle/file.php',
+            pick: {
+                multiple: true
+            },
+            chunked: true,		// 分片
+            threads: 5,			// 并发数
+            fileNumLimit: 100,
+            accept: {
+                extensions: 'txt,doc,docx,xls,xlsx,pdf,ppt,pptx,html,css,js,php,mp3,mp4,avi,rmvb,jpg,jpeg,png,gif,sql,psd,rar,zip,chm,xml'
+            },
+            formData: {
+                act: 'upload',
+                fid: g.id,
+                method: g.method
+            },
+            disableGlobalDnd:false
+        });
+
+        this.event();
+    }
+    up.event = function(){
+
+        // 当有文件被添加进队列的时候-md5序列化
+        this.ins.on('fileQueued', function (file) {
+            // 文件上传验证
+            $.post('php/handle/file.php', {
+                act: 'checkFile',
+                fid: g.id,
+                method: g.method,
+                name: file.name
+            },function (data) {
+                var res = $.parseJSON(data);
+                var msg = null;
+                if (res.status != 0) {
+                    if (res.status == 1) {
+                        msg = '用户权限不足';
+                    } else if (res.status == 2) {
+                        msg = '文件已在私有目录中';
+                    } else if (res.status == 3) {
+                        msg = '文件已在课业目录中';
+                    } else if (res.status == 4) {
+                        msg = '文件已在公共目录中';
+                    } else if (res.status == 5) {
+                        msg = '文件已在回收站中';
+                    }
+                    console.log(msg);
+                    up.uploader.removeFile(file);
+                }else {
+                    up.uploader.md5File(file).then(function (fileMd5){
+                        file.wholeMd5 = fileMd5;
+                        file_md5 = fileMd5;
+                        // 检查是否有已经上传成功的分片文件
+                        $.post('php/handle/file.php', { act: 'checkBlock', md5: file_md5 }, function (data) {
+                            var res = $.parseJSON(data);
+                            // 如果有对应的分片，推入数组
+                            if (res.block_info) {
+                                for (var i in res.block_info) {
+                                    up.block_info.push(res.block_info[i]);
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
+        // 发送前检查分块,并附加MD5数据
+        up.uploader.on('uploadBeforeSend', function (block, data) {
+            var file = block.file;
+            var deferred = WebUploader.Deferred();
+
+            data.md5value = file.wholeMd5;
+            data.status = file.status;
+
+            if ($.inArray(block.chunk.toString(), block_info) >= 0) {
+                deferred.reject();
+                deferred.resolve();
+                return deferred.promise();
+            }
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        up.uploader.on('uploadProgress', function (file, percentage) {
+            console.log(percentage);
+        });
+
+        // 上传出错处理
+        up.uploader.on('uploadError', function (file) {
+            up.uploader.retry();
+        });
+
+        // 上传完成后触发
+        up.uploader.on('uploadSuccess', function (file, response) {
+            var msg = null;
+            console.log(response);
+            // 整理分片
+            $.post('php/handle/file.php', { act:'merge', md5: file.wholeMd5, name: file.name, fid: g.id, method: g.method, /*cid:*/},function(data){
+                console.log(data);
+                var res = $.parseJSON(data);
+                if (res.code == 0) {
+                    $.post('php/handle/file.php', { act:'uploadSuccess', fid: g.id, method: g.method, /*cid: ,*/ name: file.name, size: file.size }, function (data) {
+                        console.log(data);
+                        var res = $.parseJSON(data);
+                        var msg = null;
+                        var color = null;
+                        if (res.status == 1) {
+                            msg = '上传成功';
+                        } else {
+                            msg = '上传失败';
+                        }
+                        console.log(msg);
+                    })
+                }
+            });
+        });
+
+        // 文件验证出错触发
+        up.uploader.on('error', function(type) {
+            if (type == 'Q_EXCEED_NUM_LIMIT') {
+                console.log('文件总数不能超过5个');
+            } else if (type == 'Q_TYPE_DENIED') {
+                console.log('该文件类型不能上传');
+            }
+        });
+    }
+
     
     var panel = {};
     panel.panel_btns = $('.panel_btns');
@@ -669,9 +804,25 @@ $(function(){
         }
     };
     panel.upload_init = function(){
-        
+        var drop_area = $('.drop_area');
+        $(document).on("drop", function (e) {  //在页面中释放   
+            drop_area.hide();
+            alert(76543);
+            e.preventDefault();
+        });
+        $(document).on("dragenter", function (e) {  //拖进页面 
+            drop_area.show();
+            e.preventDefault();
+        })
+        drop_area.on("dragleave", function (e) {  //拖离页面
+            drop_area.hide();
+            e.preventDefault();
+        })
+      
     };
     panel.upload = function(){
+
+
 
     };
     panel.event = function(){
@@ -705,6 +856,7 @@ $(function(){
     };
 
     panel.init = function(){
+        this.upload_init();
         this.event();
     };
     panel.init();
